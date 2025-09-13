@@ -1,5 +1,5 @@
-import User from "../models/userModel.js";
-import Assignment from "../models/assignmentModel.js";
+import { User } from "../models/userModel.js";
+import { Assignment } from "../models/assignmentModel.js";
 import { hashPassword, comparePassword } from "../utils/hash.js";
 import { generateToken, verifyToken } from "../utils/jwt.js";
 
@@ -56,9 +56,9 @@ export const loginUser = async (req, res) => {
 
     const token = generateToken(user._id);
     res.status(200).json({
-      message: "Login successfull",
+      message: "Login successful",
       token,
-      admin: {
+      user: {
         id: user._id,
         name: user.name,
         email: user.email,
@@ -72,23 +72,18 @@ export const loginUser = async (req, res) => {
 
 export const uploadAssignment = async (req, res) => {
   try {
-    const { userEmail, task, adminEmail } = req.body;
-    if (!userEmail || !task || !adminEmail) {
+    const { task, adminEmail } = req.body;
+    if (!task || !adminEmail) {
       return res.status(400).json({ message: "All fields are mandatory" });
     }
 
-    const user = await User.findOne({ email: userEmail });
-    if (!user) {
-      return res.status(400).json({ message: "Invalid credentails" });
-    }
-
-    const admin = await User.findOne({ email: adminEmail });
-    if (!admin || admin.role !== "admin") {
-      return res.status(400).json({ message: "Invalid credentails" });
+    const admin = await User.findOne({ email: adminEmail, role: "admin" });
+    if (!admin) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const assignment = new Assignment({
-      userId: user._id,
+      userId: req.user.id,
       task,
       adminId: admin._id,
     });

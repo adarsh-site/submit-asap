@@ -18,7 +18,7 @@ const assignmentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["accept", "reject", "pending"],
+      enum: ["accepted", "rejected", "pending"],
       default: "pending",
     },
   },

@@ -1,5 +1,5 @@
-import User from "../models/userModel.js";
-import Assignment from "../models/assignmentModel.js";
+import { User } from "../models/userModel.js";
+import { Assignment } from "../models/assignmentModel.js";
 import { hashPassword, comparePassword } from "../utils/hash.js";
 import { generateToken } from "../utils/jwt.js";
 
