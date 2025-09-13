@@ -25,7 +25,7 @@ export const registerUser = async (req, res) => {
 
     await user.save();
 
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.status(201).json({
       token,
@@ -33,6 +33,7 @@ export const registerUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -54,7 +55,7 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user);
     res.status(200).json({
       message: "Login successful",
       token,
@@ -62,6 +63,7 @@ export const loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -101,6 +103,7 @@ export const getAllAdmins = async (req, res) => {
     const admins = await User.find({ role: "admin" });
     const adminList = admins.map((admin) => ({
       id: admin._id,
+      name: admin.name,
       email: admin.email,
       role: admin.role,
     }));

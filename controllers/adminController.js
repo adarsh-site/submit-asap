@@ -26,7 +26,7 @@ export const registerAdmin = async (req, res) => {
 
     await admin.save();
 
-    const token = generateToken(admin._id);
+    const token = generateToken(admin);
 
     res.status(201).json({
       token,
@@ -34,6 +34,7 @@ export const registerAdmin = async (req, res) => {
         id: admin._id,
         name: admin.name,
         email: admin.email,
+        role: admin.role,
       },
     });
   } catch (error) {
@@ -55,7 +56,7 @@ export const loginAdmin = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = generateToken(admin._id);
+    const token = generateToken(admin);
     res.status(200).json({
       message: "Login successful",
       token,
@@ -63,6 +64,7 @@ export const loginAdmin = async (req, res) => {
         id: admin._id,
         name: admin.name,
         email: admin.email,
+        role: admin.role,
       },
     });
   } catch (error) {
@@ -73,7 +75,7 @@ export const loginAdmin = async (req, res) => {
 
 export const getAssignmentForAdmin = async (req, res) => {
   try {
-    const adminId = req.user._id;
+    const adminId = req.user.id;
 
     const assignments = await Assignment.find({ adminId })
       .populate("userId", "name email")
@@ -89,10 +91,11 @@ export const getAssignmentForAdmin = async (req, res) => {
 export const acceptAssignment = async (req, res) => {
   try {
     const assignmentId = req.params.id;
+    const adminId = req.user.id;
 
-    const assignment = await Assignment.findById(assignmentId); // ✅ fixed
+    const assignment = await Assignment.findOne({ _id: assignmentId, adminId });
     if (!assignment) {
-      return res.status(404).json({ message: "Assignment not found" });
+      return res.status(404).json({ message: "Access denied" });
     }
 
     assignment.status = "accepted";
@@ -108,10 +111,11 @@ export const acceptAssignment = async (req, res) => {
 export const rejectAssignment = async (req, res) => {
   try {
     const assignmentId = req.params.id;
+    const adminId = req.user.id;
 
-    const assignment = await Assignment.findById(assignmentId); // ✅ fixed
+    const assignment = await Assignment.findOne({ _id: assignmentId, adminId });
     if (!assignment) {
-      return res.status(404).json({ message: "Assignment not found" });
+      return res.status(404).json({ message: "Access denied" });
     }
 
     assignment.status = "rejected";
